@@ -22,40 +22,77 @@ server.use(cors());
 
 // ======== ROUTING ===========
 
-// POST USUARIO (resgistrarse/login)
-server.post('/register', (req, res) => {
-    const bodyRegister = {
-        nombre: req.body.nombre,
-        correo: req.body.correo,
-        password: req.body.password
-    };
+//=================================================Usuario=================================================
 
-    // buscar en DB para que no se repitan mismos nombres/correos FALTA VALIDACION
-    /*Usuario.findAll({
-        attributes: [req.body.nombre, req.body.correo]
-    }).then(usuario => {
-        if (usuario == undefined) {
-            // Crear usuario
-            Usuario.create({
-                bodyRegister
-            }).then(banda => {
-                res.json({ banda })
-            }).catch(error => {
-                res.status(400).json( {error: error.message} );
-            });
-        } else {
-            res.status(409).json({ error: "usuario/correo ya está registrado" });
-        };
-    }).catch(error => {
-        res.status(400).json( {error: error.message} );
-    });*/
-    // Crear usuario
+// validación body login
+const validarBodyLogin = (req, res, next) => {
+    if (
+        !req.body.correo ||
+        !req.body.password
+    ) {
+        res.status(400).json({
+            error: "debe loguearse con su correo y contraseña",
+        });
+    } else {
+        next();
+    }
+};
+
+// validación body register
+const validarBodyRegister = (req, res, next) => {
+    if (
+        !req.body.nombre ||
+        !req.body.correo ||
+        !req.body.password
+    ) {
+        res.status(400).json({
+            error: "debe loguearse con su correo y contraseña",
+        });
+    } else {
+        next();
+    }
+};
+
+// validación de usuario en DB (validar nombre y mail por separado)
+const validarUsuarioNombre = async (req, res, next) => {
+    const usuarioExistente = await Usuario.findOne({
+        where:{
+            nombre: req.body.nombre
+            }
+    });
+
+    if (usuarioExistente) {
+        res.status(409).json({ error: `El nombre pertenece a un usuario registrado` });
+    } else {
+        req.usuarioNombre = usuarioExistente.nombre;
+        next();
+    }
+}
+
+const validarUsuarioCorreo = async (req, res, next) => {
+    const usuarioExistente = await Usuario.findOne({
+        where:{
+            nombre: req.body.correo
+            }
+    });
+
+    if (usuarioExistente) {
+        res.status(409).json({ error: `Ya existe una cuenta registrada con ese correo` });
+    } else {
+        req.usuarioCorreo = usuarioExistente.correo;
+        next();
+    }
+}
+
+
+// POST USUARIO (resgistrarse/login)
+server.post('/register', validarBodyRegister, validarUsuarioNombre, validarUsuarioCorreo, (req, res) => {
     Usuario.create({
-        nombre: req.body.nombre,
-        correo: req.body.correo,
+        nombre: req.usuarioNombre,
+        correo: req.usuarioCorreo,
         password: req.body.password
     }).then(usuario => {
-        res.json({ usuario })
+        res.status(200).json({ usuario });
     }).catch(error => {
         res.status(400).json({ error: error.message });
     });
@@ -63,7 +100,7 @@ server.post('/register', (req, res) => {
 })
 
 
-server.post('/login', (req, res) => {
+server.post('/login', validarBodyLogin, (req, res) => {
     const correoPost = req.body.correo;
     const passwordPost = req.body.password;
 
