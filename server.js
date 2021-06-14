@@ -148,6 +148,8 @@ server.post('/nuevo_producto', (req,res)=>{
         valor:req.body.valor,
         categoria:req.body.categoria,
         estado:req.body.estado,
+        USUARIOS_id:req.body.USUARIOS_id,
+        idproducto:req.body.idproducto,
     }).then(producto => {
         res.status(200).json({ producto });
     }).catch(error => {
@@ -174,6 +176,8 @@ server.put('/productos/:id', (req, res) => {
             producto.valor = req.body.valor;
             producto.categoria = req.body.categoria;
             producto.estado = req.body.estado;
+            USUARIOS_id = req.body.USUARIOS_id;
+            idproducto = req.body.idproducto;
         }
       });
       res.status(200).json({});
