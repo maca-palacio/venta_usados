@@ -2,6 +2,11 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const compression = require('compression');
+const expressJwt = require("express-jwt");
+const jwt = require("jsonwebtoken");
+// esto se guarda como variable de entorno
+const secretJWT = "escribiralgomuyseguro1234-lbjnwef89h234234rbhjui";
+
 const db = require('./database');
 
 // instancia de Express
@@ -17,8 +22,15 @@ server.use(helmet());
 server.use(express.json());
 server.use(compression());
 server.use(cors());
-
-
+server.use(
+    expressJwt({
+      secret: secretJWT,
+      algorithms: ["HS256"],
+    }).unless({
+      path: ["/login"],
+    })
+  );
+  
 
 // ======== ROUTING ===========
 
@@ -37,6 +49,25 @@ const validarBodyLogin = (req, res, next) => {
         next();
     }
 };
+
+
+const verificarLogin = async (req,res,next) => {
+    const loginOk = await Usuario.findOne({
+        where: {
+            correo: req.body.correo,
+            password: req.body.password
+        }
+    });
+
+    if (!loginOk) {
+        res.status(400).json({
+            error: "Credenciales incorrectas"
+        })
+    } else {
+        next();
+    }
+};
+
 
 // validación body register
 const validarBodyRegister = (req, res, next) => {
@@ -99,24 +130,17 @@ server.post('/register', validarBodyRegister, validarUsuarioCorreo, validarUsuar
 })
 
 
-server.post('/login', validarBodyLogin, (req, res) => {
-    const correoPost = req.body.correo;
-    const passwordPost = req.body.password;
-
-    res.status(200).json({ message: "Log in exitoso, falta crear JWT" });
-    // crear el token con data que no sea tan confidencial
-    /*const token = jwt.sign(
+server.post('/login', validarBodyLogin, verificarLogin, (req, res) => {
+    const token = jwt.sign(
         {
-            nombre: user_ok.nombre,
-            id: user_ok.id,
-            correo: user_ok.correo,
+            nombre: req.body.nombre,
+            correo: req.body.correo,
         },
         secretJWT,
         { expiresIn: "60m" }
     );
-
-    res.status(200).json({ token });*/
-})
+    res.status(200).json({ token });
+});
 
 
 
