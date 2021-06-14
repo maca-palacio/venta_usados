@@ -102,7 +102,7 @@ server.get('/usuarios', (req,res) => {
     })
 })
 
-
+//=================================================Transacción=================================================
 //Validación body de transacción 
 const validarBodyTransaccion = (req, res, next) => {
     if (
@@ -128,22 +128,14 @@ const validarstock = async (req, res, next) => {
         USUARIOS_id: req.body.USUARIOS_id,
         descripcion: req.body.descripcion,
       });
-
-    console.log(idproducto);  
-
     if (!idproducto) {
         res.status(400).json({ error: `El producto no existe para la venta` });
       } else {
-        //respuesta de franco como pasar variables de el middleware a la ruta
         req.idproducto = idproducto.id;
-        console.log(req.idproducto);
         next();
       }  
 
 }
-  
-
-
 
 //Crear transacción
 server.post('/transaccion', validarBodyTransaccion,validarstock, (req,res)=>{
@@ -161,7 +153,7 @@ server.post('/transaccion', validarBodyTransaccion,validarstock, (req,res)=>{
     });
 
 })
-
+//=================================================Fin transacción======================================================
 
 
 
