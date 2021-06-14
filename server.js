@@ -139,48 +139,7 @@ server.get('/usuarios', (req, res) => {
     })
 })
 
-//=================================================Pruductos=================================================
-// POST Crear un nuevo producto
-server.post('/nuevo_producto', (req,res)=>{
-    Producto.create({
-        descripcion:req.body.descripcion,
-        stock:req.body.stock,
-        valor:req.body.valor,
-        categoria:req.body.categoria,
-        estado:req.body.estado,
-    }).then(producto => {
-        res.status(200).json({ producto });
-    }).catch(error => {
-        res.status(400).json({ error: error.message });
-    });
-
-})
-
-// GET productos
-server.get('/productos', (req, res) => {
-    Producto.findAll().then(productos => {
-        res.json(productos);
-    }).catch(error => {
-        res.send(error.message);
-    })
-})
-
-//PUT Actualizar producto
-server.put('/productos/:id', (req, res) => {
-    Producto.forEach((producto) => {
-        if (producto.id == req.params.id) {
-            producto.descripcion = req.body.descripcion;
-            producto.stock = req.body.stock;
-            producto.valor = req.body.valor;
-            producto.categoria = req.body.categoria;
-            producto.estado = req.body.estado;
-        }
-      });
-      res.status(200).json({});
-    });
-
-
-//=================================================Transacción=================================================
+//===========================================================Transacción=================================================
 //Validación body de transacción 
 const validarBodyTransaccion = (req, res, next) => {
     if (
@@ -198,6 +157,8 @@ const validarBodyTransaccion = (req, res, next) => {
         next();
     }
 };
+
+//Valida si el vendedor tiene el producto en inventario
 
 const validarproduct = async (req, res, next) => {
     const idstockproducto = await Producto.findOne({
@@ -218,6 +179,7 @@ const validarproduct = async (req, res, next) => {
 
 }
 
+//valida que las cantidades del stock esten disponibles y las actualiza 
 const validarstock = async (req, res, next) => {
     const stockproducto = await Producto.findOne({
         where:{
@@ -248,8 +210,7 @@ const validarstock = async (req, res, next) => {
 }
 
 
-//========================Actualiza el stock de productos=======================//
-
+//Actualiza el stock de productos
 const actualizarstock = async (idpro,n1,n2) => {
     const stocknew = n1-n2;
     Producto.update(
@@ -262,7 +223,7 @@ const actualizarstock = async (idpro,n1,n2) => {
 };
 
 
-//Crear transacción =================================================================
+//Crear transacción
 server.post('/transaccion', validarBodyTransaccion, validarproduct, validarstock, (req, res) => {
     Transaccion.create({
         fecha: req.body.fecha,
@@ -287,12 +248,10 @@ server.get('/transacciones', (req, res) => {
         res.send(error.message);
     })
 })
-//=================================================Fin transacción======================================================
 
 
 
-
-// =======================================
+//=================================================Fin transacción======================================================//
 // ======= Inicializar el SERVIDOR =======
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
