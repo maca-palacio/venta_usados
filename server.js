@@ -46,7 +46,7 @@ const validarBodyRegister = (req, res, next) => {
         !req.body.password
     ) {
         res.status(400).json({
-            error: "debe loguearse con su correo y contraseña",
+            error: "debe registrarse con los datos completos",
         });
     } else {
         next();
@@ -64,7 +64,6 @@ const validarUsuarioNombre = async (req, res, next) => {
     if (usuarioExistente) {
         res.status(409).json({ error: `El nombre pertenece a un usuario registrado` });
     } else {
-        req.usuarioNombre = usuarioExistente.nombre;
         next();
     }
 }
@@ -72,31 +71,31 @@ const validarUsuarioNombre = async (req, res, next) => {
 const validarUsuarioCorreo = async (req, res, next) => {
     const usuarioExistente = await Usuario.findOne({
         where:{
-            nombre: req.body.correo
+            correo: req.body.correo
             }
     });
 
     if (usuarioExistente) {
         res.status(409).json({ error: `Ya existe una cuenta registrada con ese correo` });
     } else {
-        req.usuarioCorreo = usuarioExistente.correo;
         next();
     }
 }
 
 
+
+
 // POST USUARIO (resgistrarse/login)
-server.post('/register', validarBodyRegister, validarUsuarioNombre, validarUsuarioCorreo, (req, res) => {
+server.post('/register', validarBodyRegister, validarUsuarioCorreo, validarUsuarioNombre, (req, res) => {
     Usuario.create({
-        nombre: req.usuarioNombre,
-        correo: req.usuarioCorreo,
+        nombre: req.body.nombre,
+        correo: req.body.correo,
         password: req.body.password
     }).then(usuario => {
         res.status(200).json({ usuario });
     }).catch(error => {
         res.status(400).json({ error: error.message });
     });
-
 })
 
 
@@ -104,28 +103,19 @@ server.post('/login', validarBodyLogin, (req, res) => {
     const correoPost = req.body.correo;
     const passwordPost = req.body.password;
 
-    // buscar en DB  FALTA VALIDACION VER VIEN CÓMO FUNCIONA EL FIND ALL
-    const user_ok = Usuario.findAll({
-        attributes: [correoPost, passwordPost]
-    });
+    res.status(200).json({ message: "Log in exitoso, falta crear JWT" });
+    // crear el token con data que no sea tan confidencial
+    /*const token = jwt.sign(
+        {
+            nombre: user_ok.nombre,
+            id: user_ok.id,
+            correo: user_ok.correo,
+        },
+        secretJWT,
+        { expiresIn: "60m" }
+    );
 
-    if (!user_ok) {
-        res.status(401).json({ error: "compruebe usuario y contraseña" });
-    } else {
-        res.status(200).json({ message: "Log in exitoso, falta crear JWT" });
-        // crear el token con data que no sea tan confidencial
-        /*const token = jwt.sign(
-            {
-                nombre: user_ok.nombre,
-                id: user_ok.id,
-                correo: user_ok.correo,
-            },
-            secretJWT,
-            { expiresIn: "60m" }
-        );
-
-        res.status(200).json({ token });*/
-    }
+    res.status(200).json({ token });*/
 })
 
 
