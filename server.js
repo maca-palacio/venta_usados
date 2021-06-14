@@ -192,8 +192,10 @@ const validarstock = async (req, res, next) => {
         req.stockproducto = stockproducto.stock;
         //busca por id del producto y actualiza el stock
         actualizarstock(stockproducto.id,stockproducto.stock,stockproducto.stock);
+        req.valortotal=req.body.cantidad*stockproducto.valor;
         console.log("================solo el valor del stock================");
         console.log(req.stockproducto);
+        next();
     } else {
         req.stockproducto = req.body.cantidad;
         //busca por id del producto y actualiza el stock
