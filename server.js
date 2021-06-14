@@ -123,7 +123,6 @@ const validarBodyTransaccion = (req, res, next) => {
 };
 
 const validarproduct = async (req, res, next) => {
-
     const idstockproducto = await Producto.findOne({
         where:{
             USUARIOS_id: req.body.USUARIOS_id,
@@ -163,8 +162,6 @@ const validarstock = async (req, res, next) => {
 
 }
 
-
-
 //Crear transacción
 server.post('/transaccion', validarBodyTransaccion, validarproduct, validarstock, (req, res) => {
     Transaccion.create({
@@ -180,6 +177,15 @@ server.post('/transaccion', validarBodyTransaccion, validarproduct, validarstock
         res.status(400).json({ error: error.message });
     });
 
+})
+
+// endpoint consulta todos las transacciones 
+server.get('/transacciones', (req, res) => {
+    Transaccion.findAll().then(transa => {
+        res.json(transa);
+    }).catch(error => {
+        res.send(error.message);
+    })
 })
 //=================================================Fin transacción======================================================
 
