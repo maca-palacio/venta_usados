@@ -103,16 +103,57 @@ server.get('/usuarios', (req,res) => {
 })
 
 
-//Crear transacción
-server.post('/transaccion', (req,res)=>{
+//Validación body de transacción 
+const validarBodyTransaccion = (req, res, next) => {
+    if (
+      !req.body.fecha ||
+      !req.body.cantidad ||
+      !req.body.valor_total ||
+      !req.body.metodo_pago ||
+      !req.body.comprador ||
+      !req.body.USUARIOS_id ||
+      !req.body.descripcion
+    ) {
+      res.status(400).json({
+        error: "debe enviar los datos completos de la transacción",
+      });
+    } else {
+      next();
+    }
+  };
 
+const validarstock = async (req, res, next) => {
+
+    const idproducto = await Producto.findOne({
+        USUARIOS_id: req.body.USUARIOS_id,
+        descripcion: req.body.descripcion,
+      });
+
+    console.log(idproducto);  
+
+    if (!idproducto) {
+        res.status(400).json({ error: `El producto no existe para la venta` });
+      } else {
+        //respuesta de franco como pasar variables de el middleware a la ruta
+        req.idproducto = idproducto.id;
+        console.log(req.idproducto);
+        next();
+      }  
+
+}
+  
+
+
+
+//Crear transacción
+server.post('/transaccion', validarBodyTransaccion,validarstock, (req,res)=>{
     Transaccion.create({
         fecha: req.body.fecha,
         cantidad: req.body.cantidad,
         valor_total: req.body.valor_total,
         metodo_pago: req.body.metodo_pago,
         comprador:req.body.comprador,
-        PRODUCTOS_idPRODUCTOS: req.body.PRODUCTOS_idPRODUCTOS
+        PRODUCTOS_idPRODUCTOS: req.idproducto
     }).then(usuario => {
         res.json({ usuario })
     }).catch(error => {
