@@ -145,7 +145,8 @@ const validarstock = async (req, res, next) => {
     const stockproducto = await Producto.findOne({
         where:{
             USUARIOS_id: req.body.USUARIOS_id,
-            idproducto: req.body.idproducto,}
+            idproducto: req.body.idproducto
+        }
     });
     console.log("================el producto encontrado================");
     console.log(stockproducto);
@@ -153,14 +154,33 @@ const validarstock = async (req, res, next) => {
         res.status(400).json({ error: `No hay unidades disponibles para la venta` });
     } else if (stockproducto.stock < req.body.cantidad) {
         req.stockproducto = stockproducto.stock;
+        //busca por id del producto y actualiza el stock
+        actualizarstock(stockproducto.id,stockproducto.stock,stockproducto.stock);
         console.log("================solo el valor del stock================");
         console.log(req.stockproducto);
     } else {
         req.stockproducto = req.body.cantidad;
+        //busca por id del producto y actualiza el stock
+        actualizarstock(stockproducto.id,stockproducto.stock,req.body.cantidad);
         next();
     }
 
 }
+
+
+//========================Actualiza el stock de productos=======================//
+
+const actualizarstock = async (idpro,n1,n2) => {
+    const stocknew = n1-n2;
+    Producto.update(
+        { stock: stocknew },
+        { where: {id: idpro} }
+   ).then(product => {
+        console.log("================================Actualización de stock=================================");
+        console.log(product);
+   }).catch(err => console.log('error: ' + err));
+};
+
 
 //Crear transacción
 server.post('/transaccion', validarBodyTransaccion, validarproduct, validarstock, (req, res) => {
@@ -205,9 +225,6 @@ server.listen(PORT, () => {
         console.log("Se ha producido un error: " + error);
     });
 });
-
-
-
 
 
 //******** clonar de  https://github.com/maca-palacio/venta_usados.git
