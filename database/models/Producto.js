@@ -9,7 +9,8 @@ Producto.init({
     valor: DataTypes.DOUBLE,
     categoria: DataTypes.STRING,
     estado: DataTypes.ENUM('DISPONIBLE','VENDIDO'),
-    USUARIOS_id: DataTypes.INTEGER
+    USUARIOS_id: DataTypes.INTEGER,
+    idproducto:DataTypes.INTEGER
 }, 
 { 
     sequelize,

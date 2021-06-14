@@ -23,7 +23,7 @@ server.use(cors());
 // ======== ROUTING ===========
 
 // POST USUARIO (resgistrarse/login)
-server.post('/register', (req,res) => {
+server.post('/register', (req, res) => {
     const bodyRegister = {
         nombre: req.body.nombre,
         correo: req.body.correo,
@@ -75,7 +75,7 @@ server.post('/login', (req, res) => {
     if (!user_ok) {
         res.status(401).json({ error: "compruebe usuario y contraseña" });
     } else {
-        res.status(200).json({message : "Log in exitoso, falta crear JWT"});
+        res.status(200).json({ message: "Log in exitoso, falta crear JWT" });
         // crear el token con data que no sea tan confidencial
         /*const token = jwt.sign(
             {
@@ -94,7 +94,7 @@ server.post('/login', (req, res) => {
 
 
 // GET USUARIOS
-server.get('/usuarios', (req,res) => {
+server.get('/usuarios', (req, res) => {
     Usuario.findAll().then(usuarios => {
         res.json(usuarios);
     }).catch(error => {
@@ -106,46 +106,74 @@ server.get('/usuarios', (req,res) => {
 //Validación body de transacción 
 const validarBodyTransaccion = (req, res, next) => {
     if (
-      !req.body.fecha ||
-      !req.body.cantidad ||
-      !req.body.valor_total ||
-      !req.body.metodo_pago ||
-      !req.body.comprador ||
-      !req.body.USUARIOS_id ||
-      !req.body.descripcion
+        !req.body.fecha ||
+        !req.body.cantidad ||
+        !req.body.valor_total ||
+        !req.body.metodo_pago ||
+        !req.body.comprador ||
+        !req.body.USUARIOS_id ||
+        !req.body.idproducto
     ) {
-      res.status(400).json({
-        error: "debe enviar los datos completos de la transacción",
-      });
+        res.status(400).json({
+            error: "debe enviar los datos completos de la transacción",
+        });
     } else {
-      next();
-    }
-  };
-
-const validarstock = async (req, res, next) => {
-
-    const idproducto = await Producto.findOne({
-        USUARIOS_id: req.body.USUARIOS_id,
-        descripcion: req.body.descripcion,
-      });
-    if (!idproducto) {
-        res.status(400).json({ error: `El producto no existe para la venta` });
-      } else {
-        req.idproducto = idproducto.id;
         next();
-      }  
+    }
+};
+
+const validarproduct = async (req, res, next) => {
+
+    const idstockproducto = await Producto.findOne({
+        where:{
+            USUARIOS_id: req.body.USUARIOS_id,
+            idproducto: req.body.idproducto,}
+    });
+    console.log("================el producto encontrado================");
+    console.log(idstockproducto);
+    if (!idstockproducto) {
+        res.status(400).json({ error: `El producto no existe para la venta` });
+    } else {
+        req.idstockproducto = idstockproducto.id;
+        console.log("================el producto encontrado================");
+        console.log(req.idstockproducto);
+        next();
+    }
 
 }
 
+const validarstock = async (req, res, next) => {
+    const stockproducto = await Producto.findOne({
+        where:{
+            USUARIOS_id: req.body.USUARIOS_id,
+            idproducto: req.body.idproducto,}
+    });
+    console.log("================el producto encontrado================");
+    console.log(stockproducto);
+    if (stockproducto.stock == 0) {
+        res.status(400).json({ error: `No hay unidades disponibles para la venta` });
+    } else if (stockproducto.stock < req.body.cantidad) {
+        req.stockproducto = stockproducto.stock;
+        console.log("================solo el valor del stock================");
+        console.log(req.stockproducto);
+    } else {
+        req.stockproducto = req.body.cantidad;
+        next();
+    }
+
+}
+
+
+
 //Crear transacción
-server.post('/transaccion', validarBodyTransaccion,validarstock, (req,res)=>{
+server.post('/transaccion', validarBodyTransaccion, validarproduct, validarstock, (req, res) => {
     Transaccion.create({
         fecha: req.body.fecha,
-        cantidad: req.body.cantidad,
+        cantidad: req.stockproducto,
         valor_total: req.body.valor_total,
         metodo_pago: req.body.metodo_pago,
-        comprador:req.body.comprador,
-        PRODUCTOS_idPRODUCTOS: req.idproducto
+        comprador: req.body.comprador,
+        PRODUCTOS_idPRODUCTOS: req.idstockproducto
     }).then(usuario => {
         res.json({ usuario })
     }).catch(error => {
