@@ -145,7 +145,6 @@ const validarBodyTransaccion = (req, res, next) => {
     if (
         !req.body.fecha ||
         !req.body.cantidad ||
-        !req.body.valor_total ||
         !req.body.metodo_pago ||
         !req.body.comprador ||
         !req.body.USUARIOS_id ||
@@ -199,6 +198,7 @@ const validarstock = async (req, res, next) => {
         req.stockproducto = req.body.cantidad;
         //busca por id del producto y actualiza el stock
         actualizarstock(stockproducto.id,stockproducto.stock,req.body.cantidad);
+        req.valortotal=req.body.cantidad*stockproducto.valor;
         next();
     }
 
@@ -219,12 +219,12 @@ const actualizarstock = async (idpro,n1,n2) => {
 };
 
 
-//Crear transacción
+//Crear transacción =================================================================
 server.post('/transaccion', validarBodyTransaccion, validarproduct, validarstock, (req, res) => {
     Transaccion.create({
         fecha: req.body.fecha,
         cantidad: req.stockproducto,
-        valor_total: req.body.valor_total,
+        valor_total: req.valortotal,
         metodo_pago: req.body.metodo_pago,
         comprador: req.body.comprador,
         PRODUCTOS_idPRODUCTOS: req.idstockproducto
