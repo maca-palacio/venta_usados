@@ -5,6 +5,7 @@ class Producto extends Model {}
 Producto.init({
     //id: DataTypes.INTEGER,
     descripcion: DataTypes.STRING,
+    stock:DataTypes.INTEGER,
     valor: DataTypes.DOUBLE,
     categoria: DataTypes.STRING,
     estado: DataTypes.ENUM('DISPONIBLE','VENDIDO'),

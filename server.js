@@ -2,10 +2,10 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const compression = require('compression');
+const db = require('./database');
 
 // instancia de Express
 const server = express();
-const db = require('./database');
 const PORT = 3000;
 // instanciar modelos
 const Producto = require('./database/models/Producto');
@@ -101,6 +101,26 @@ server.get('/usuarios', (req,res) => {
         res.send(error.message);
     })
 })
+
+
+//Crear transacción
+server.post('/transaccion', (req,res)=>{
+
+    Transaccion.create({
+        fecha: req.body.fecha,
+        cantidad: req.body.cantidad,
+        valor_total: req.body.valor_total,
+        metodo_pago: req.body.metodo_pago,
+        comprador:req.body.comprador,
+        PRODUCTOS_idPRODUCTOS: req.body.PRODUCTOS_idPRODUCTOS
+    }).then(usuario => {
+        res.json({ usuario })
+    }).catch(error => {
+        res.status(400).json({ error: error.message });
+    });
+
+})
+
 
 
 
