@@ -154,8 +154,29 @@ server.get('/usuarios', (req, res) => {
 })
 
 //=================================================Pruductos=================================================
+
+const validarBodyProducto = (req, res, next) => {
+    if (
+        !req.body.descripcion||
+        !req.body.stock ||
+        !req.body.valor ||
+        !req.body.categoria ||
+        !req.body.estado ||
+        !req.body.USUARIOS_id ||
+        !req.body.idproducto
+    ) {
+        res.status(400).json({
+            error: "Debe enviar los datos completos del producto",
+        });
+    } else {
+        next();
+    }
+};
+
+
+
 // POST Crear un nuevo producto
-server.post('/nuevo_producto', (req,res)=>{
+server.post('/nuevo_producto',validarBodyProducto, (req,res)=>{
     Producto.create({
         descripcion:req.body.descripcion,
         stock:req.body.stock,
