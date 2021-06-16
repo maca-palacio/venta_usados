@@ -9,8 +9,8 @@ document.addEventListener("DOMContentLoaded", (ev) => {
         const passwordInputValue = document.getElementById("password").value;
 
         const bodyPost={
-            username:usernameInputValue,
-            pws:passwordInputValue
+            correo:usernameInputValue,
+            password:passwordInputValue
         }
         
         var myHeader = new Headers();
