@@ -27,8 +27,7 @@ server.use(
       secret: secretJWT,
       algorithms: ["HS256"],
     }).unless({
-      path: ["/login"],
-      path: ["/register"]
+      path: ["/login","/register"]
     })
   );
   
