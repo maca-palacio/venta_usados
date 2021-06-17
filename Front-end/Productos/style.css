@@ -1,0 +1,102 @@
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  background-color: white;
+  max-width: 100%;
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin: 10px;
+}
+
+header .logo {
+  height: 50px;
+  width: 50px;
+}
+
+header h1 {
+  color: #00004c;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+header a {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+header a #carrito {
+  background-color: #4a77d4;
+  background-image: -ms-linear-gradient(top, #6eb6de, #4a77d4);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#6eb6de), to(#4a77d4));
+  width: 130px;
+  justify-self: flex-end;
+  border-radius: 10px;
+}
+
+header a #home-btn {
+  background-color: #d97f6d;
+  width: 130px;
+  justify-self: flex-end;
+  border-radius: 28px;
+}
+
+.search {
+  margin-top: 100px;
+  height: 50px;
+  background: #FFFFFF;
+  outline: none;
+  border: none;
+  border-radius: 27px;
+}
+
+.btn-ordenamiento {
+  margin-top: 15px;
+  margin-left: 15px;
+  height: 50px;
+  padding: 0 10px;
+}
+
+.btn-ordenamiento:hover {
+  background-color: yellow;
+  color: #000;
+}
+
+#productos {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  padding: 10px;
+  margin-top: 40px;
+  background-color: #acaaaa;
+}
+
+.nuevo-producto {
+  height: 20px;
+  width: 20px;
+  margin: 5px;
+}
+
+.contenedor button {
+  background-color: #e6d199;
+  width: 80px;
+}
+/*# sourceMappingURL=style.css.map */
