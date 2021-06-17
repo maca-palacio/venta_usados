@@ -28,6 +28,7 @@ server.use(
       algorithms: ["HS256"],
     }).unless({
       path: ["/login"],
+      path: ["/register"]
     })
   );
   
